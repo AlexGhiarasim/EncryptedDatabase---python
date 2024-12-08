@@ -1,12 +1,43 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import font
+import random
+import string
 from database.db_config import get_connection
+from file_operations.add_file import *
+from file_operations.delete_file import *
+from file_operations.read_file import *
 
 def get_data():
     input_text = input_entry.get()
-    output = f"Output: {input_text}"
-    output_label.config(text=output)
+    try:
+        parts = input_text.strip().split(" ", 1)
+        if len(parts) != 2:
+            raise ValueError("Invalid input! Use 'add file_path' or 'delete file_name' or 'read file_name'.")
+
+        command, argument = parts
+
+        if command.lower() == "add":
+            encryption_key = "fe1a1915a379f3be5394b64d14794932"  # function to generate random key TODO
+            encryption_method = "RSA"
+            output = add_file(argument, encryption_key, encryption_method)
+
+        elif command.lower() == "delete":
+            output = delete_file(argument)
+
+        elif command.lower() == "read":
+            output = read_file(argument)
+
+        else:
+            raise ValueError("Invalid command. Accepted commands: add, delete, read.")
+
+        output_label.config(text=output, fg="gray")
+
+    except Exception as e:
+        error_message = str(e)
+        output_label.config(text=f"Error: {error_message}", fg="gray")
+    
+    input_entry.delete(0, tk.END)
 
 def runApp():
     try:
@@ -22,7 +53,7 @@ def runApp():
 if runApp():
     window = tk.Tk()
     window.title("Encrypted Security System")
-    window.geometry("650x450")
+    window.geometry("750x450")
     window.config(bg="#2e3b4e")
 
     title_font = font.Font(family="Helvetica", size=18, weight="bold")

@@ -11,33 +11,41 @@ from file_operations.read_file import *
 def get_data():
     input_text = input_entry.get()
     try:
+        # Împărțim inputul în 2 părți: comanda (add/delete/read) și restul argumentului
         parts = input_text.strip().split(" ", 1)
+        
+        # Verificăm dacă există exact 2 părți (comandă și argument)
         if len(parts) != 2:
             raise ValueError("Invalid input! Use 'add file_path' or 'delete file_name' or 'read file_name'.")
 
         command, argument = parts
 
+        # Execută comanda corespunzătoare
         if command.lower() == "add":
-            encryption_key = "fe1a1915a379f3be5394b64d14794932"  # function to generate random key TODO
-            encryption_method = "RSA"
-            output = add_file(argument, encryption_key, encryption_method)
+            output = add_file(argument, "RSA")
 
         elif command.lower() == "delete":
             output = delete_file(argument)
 
         elif command.lower() == "read":
+            # Verificăm dacă argumentul este un fișier criptat
             output = read_file(argument)
 
         else:
             raise ValueError("Invalid command. Accepted commands: add, delete, read.")
 
+        # Afișăm rezultatul în UI
         output_label.config(text=output, fg="gray")
 
     except Exception as e:
+        # Capturăm erorile și le afișăm în UI
         error_message = str(e)
         output_label.config(text=f"Error: {error_message}", fg="gray")
     
+    # Curățăm câmpul de input
     input_entry.delete(0, tk.END)
+
+
 
 def runApp():
     try:

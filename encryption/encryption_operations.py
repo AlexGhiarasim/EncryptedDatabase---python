@@ -1,3 +1,4 @@
+import json
 import math
 import random
 
@@ -40,8 +41,16 @@ def encrypt(message, public_key):
     return [pow(ord(char), e, n) for char in message]
 
 def decrypt(encrypted_message, private_key):
-    d, n = private_key
-    return ''.join([chr(pow(char, d, n)) for char in encrypted_message])
+    values = private_key.strip("()").split(",")
+    d = int(values[0])
+    n = int(values[1])
+
+    if isinstance(encrypted_message, int):
+        decrypted_char = chr(pow(encrypted_message, d, n))
+        return decrypted_char
+    else:
+        raise ValueError("encrypted_message not a number")
+
 
 def split_file(file_path, segment_size=50):
     with open(file_path, 'rb') as file:
@@ -61,21 +70,28 @@ def encrypt_file(file_path, public_key, segment_size=50):
         for segment in encrypted_segments:
             enc_file.write(bytes(str(segment), 'utf-8'))
 
-    print(f"Fișierul {file_path} a fost criptat și salvat ca {file_path}.enc")
+    print(f"File {file_path} was encrypted and save as {file_path}.enc")
 
 def decrypt_file(file_path, private_key):
-    with open(file_path, 'rb') as enc_file:
-        encrypted_segments = enc_file.read()
+    with open(file_path, 'r') as enc_file:
+        segments = json.load(enc_file)
 
-    segments = eval(encrypted_segments.decode('utf-8'))
+    print(f"segments: {segments}")
 
     decrypted_segments = []
 
     for segment in segments:
         decrypted_segments.append(decrypt(segment, private_key))
 
-    with open(file_path.replace('.enc', '.dec'), 'wb') as dec_file:
-        for segment in decrypted_segments:
-            dec_file.write(segment.encode())
+    print(f"decrypted_segments: {decrypted_segments}")
 
-    print(f"Fișierul {file_path} a fost decriptat și salvat ca {file_path.replace('.enc', '.dec')}")
+    combined_content = ''.join(decrypted_segments)
+
+    with open(file_path.replace('.enc', '.dec'), 'wb') as dec_file:
+        dec_file.write(combined_content.encode())
+
+    print(f"File {file_path} was decrypted and saved as {file_path.replace('.enc', '')}")
+
+    return combined_content
+
+

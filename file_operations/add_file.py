@@ -6,17 +6,14 @@ from encryption.encryption_operations import *
 BASE_DIR = "./encrypted_files"
 
 def add_file(file_path, encryption_method):
-    """
-    Add a file to the database, encrypt it, and store the private key.
-    """
-    if os.path.exists(file_path):  # Check if the file exists locally
+    if os.path.exists(file_path):
         final_path = file_path  
     else:
         absolute_path = os.path.abspath(file_path)
-        if os.path.exists(absolute_path):  # Check if the file exists with an absolute path
+        if os.path.exists(absolute_path):
             final_path = absolute_path 
         else:
-            return "File to add not found!"  # Return if the file doesn't exist
+            return "File to add not found!"
 
     if not os.path.exists(BASE_DIR): 
         os.makedirs(BASE_DIR)
@@ -40,9 +37,6 @@ def add_file(file_path, encryption_method):
     return "File added to database, encrypted, and private key saved successfully!"
 
 def encrypt_and_save_file(file_path, public_key):
-    """
-    Encrypt the file and save it in the encrypted_files directory.
-    """
     encrypted_file_path = file_path + '.enc'
 
     encrypt_file(file_path, public_key)

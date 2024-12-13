@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import font
-import random
-import string
 from database.db_config import get_connection
 from file_operations.add_file import *
 from file_operations.delete_file import *
@@ -11,43 +9,35 @@ from file_operations.read_file import *
 def get_data():
     input_text = input_entry.get()
     try:
-        # Împărțim inputul în 2 părți: comanda (add/delete/read) și restul argumentului
         parts = input_text.strip().split(" ", 1)
         
-        # Verificăm dacă există exact 2 părți (comandă și argument)
         if len(parts) != 2:
             raise ValueError("Invalid input! Use 'add file_path' or 'delete file_name' or 'read file_name'.")
 
         command, argument = parts
 
-        # Execută comanda corespunzătoare
         if command.lower() == "add":
             output = add_file(argument, "RSA")
 
         elif command.lower() == "delete":
-            output = delete_file(argument)
+            output = delete_file(argument + ".enc")
 
         elif command.lower() == "read":
-            # Verificăm dacă argumentul este un fișier criptat
-            output = read_file(argument)
+            output = read_file(argument + ".enc")
 
         else:
             raise ValueError("Invalid command. Accepted commands: add, delete, read.")
 
-        # Afișăm rezultatul în UI
         output_label.config(text=output, fg="gray")
 
     except Exception as e:
-        # Capturăm erorile și le afișăm în UI
         error_message = str(e)
         output_label.config(text=f"Error: {error_message}", fg="gray")
     
-    # Curățăm câmpul de input
     input_entry.delete(0, tk.END)
 
 
-
-def runApp():
+def runApp(): 
     try:
         connection = get_connection()
         if connection:

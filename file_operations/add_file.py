@@ -18,8 +18,7 @@ def add_file(file_path, encryption_method):
     if not os.path.exists(BASE_DIR): 
         os.makedirs(BASE_DIR)
 
-    public_key, private_key = generate_keys()
-
+    public_key, private_key = generate_key_pair()
     encrypted_file_path = encrypt_and_save_file(final_path, public_key)
 
     file_name = os.path.basename(final_path) + '.enc'
@@ -34,15 +33,20 @@ def add_file(file_path, encryption_method):
             cur.execute(query, (file_name, private_key, encryption_method, stored_file_path))
             conn.commit()
 
-    return "File added to database, encrypted, and private key saved successfully!"
+    return "File encrypted successfully! Private key stored in database!"
 
 def encrypt_and_save_file(file_path, public_key):
-    encrypted_file_path = file_path + '.enc'
-
-    encrypt_file(file_path, public_key)
-
-    file_name = os.path.basename(file_path) + '.enc'
-    encrypted_file_path = os.path.join(BASE_DIR, file_name)
+    encrypted_file_path = encrypt_file(file_path, public_key)
     
-    shutil.move(file_path + '.enc', encrypted_file_path)
+    final_encrypted_file_path = os.path.join(BASE_DIR, os.path.basename(encrypted_file_path))
 
+    if not os.path.exists(BASE_DIR):
+        os.makedirs(BASE_DIR)
+
+    shutil.move(encrypted_file_path, final_encrypted_file_path)
+    print(f"Fișier criptat și mutat la: {final_encrypted_file_path}")
+
+    os.remove(file_path)
+    print(f"Fișierul original {file_path} a fost șters.")
+
+    return final_encrypted_file_path

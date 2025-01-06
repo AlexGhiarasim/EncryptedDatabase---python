@@ -7,6 +7,15 @@ import json
 from pathlib import Path
 
 def is_prime(number):
+    """
+    This function checks if a number is prime.
+
+    Parameters:
+    number (int): The number to check.
+
+    Returns:
+    bool: True if the number is prime, False otherwise.
+    """
     if number <= 1:
         return False
     for i in range(2, int(math.sqrt(number)) + 1):
@@ -15,6 +24,15 @@ def is_prime(number):
     return True
 
 def generate_primes():
+    """
+    This function generates two prime numbers between 100 and 1000.
+
+    Parameters:
+    None
+
+    Returns:
+    tuple: A tuple containing two prime numbers -> keys for RSA encryption.
+    """
     while True:
         prime1 = random.randint(100, 1000)
         prime2 = random.randint(100, 1000)
@@ -22,12 +40,30 @@ def generate_primes():
             return prime1, prime2
 
 def generate_E(m):
+    """
+    This function generates a coprime number to m.
+
+    Parameters:
+    m (int): The number to which the coprime number should be generated.
+
+    Returns:
+    int: A coprime number to m.
+    """
     coprime_number = 2
     while math.gcd(m, coprime_number) != 1:
         coprime_number = random.randint(2, m - 1)
     return coprime_number
 
 def generate_D(M, E):
+    """
+    This function generates a number D such that (D * E) % M = 1.
+
+    Parameters:
+    M (int): The number to which the coprime number should be generated.
+
+    Returns:
+    int: A coprime number to M.
+    """
     k = 1
     while True:
         d = (((M * k) + 1) / E)
@@ -36,6 +72,15 @@ def generate_D(M, E):
         k += 1
 
 def generate_key_pair():
+    """
+    This function generates a public and private key pair for RSA encryption.
+
+    Parameters:
+    None
+
+    Returns:
+    tuple: A tuple containing the public and private keys.
+    """
     p, q = generate_primes()
     n = p * q
     m = (p - 1) * (q - 1)
@@ -44,19 +89,55 @@ def generate_key_pair():
     return (e, n), (d, n)
 
 def encrypt(data, public_key):
+    """
+    This function encrypts the data using the public key.
+
+    Parameters:
+    data (str): The data to encrypt.
+
+    Returns:
+    list: A list containing the encrypted data.
+    """
     e, n = public_key
     return [pow(int(char), e, n) for char in data]
 
 def decrypt(encrypted_data, private_key):
+    """
+    This function decrypts the data using the private key.
+
+    Parameters:
+    encrypted_data (list): The data to decrypt.
+
+    Returns:
+    list: A list containing the decrypted data.
+    """
     if isinstance(private_key, str):
         private_key = eval(private_key)
     d, n = private_key
     return [pow(char, d, n) for char in encrypted_data]
 
 def split_data(data, segment_size=50):
+    """
+    This function splits the data into segments of a given size.
+
+    Parameters:
+    data (str): The data to split.
+
+    Returns:
+    list: A list containing the data
+    """
     return [data[i:i + segment_size] for i in range(0, len(data), segment_size)]
 
 def encrypt_file(file_path, public_key, segment_size=50):
+    """
+    This function encrypts a file using the public key and saves it to disk.
+
+    Parameters:
+    file_path (str): The path to the file that needs to be encrypted.
+
+    Returns:
+    str: The path where the encrypted file is saved.
+    """
     file_path = Path(file_path)
     data = None
 
@@ -83,11 +164,20 @@ def encrypt_file(file_path, public_key, segment_size=50):
             }
         }, enc_file)
 
-    print(f"Fișierul {file_path} a fost criptat și salvat ca {encrypted_file_path}")
+    print(f"File {file_path} crypted successfully and saved!")
     return str(encrypted_file_path) 
 
 
 def decrypt_file(file_path, private_key):
+    """
+    This function decrypts a file using the private key and saves it to disk.
+
+    Parameters:
+    file_path (str): The path to the file that needs to be decrypted.
+
+    Returns:
+    None
+    """
     file_path = Path(file_path)
     with open(file_path, 'r') as enc_file:
         encrypted_data = json.load(enc_file)
@@ -103,17 +193,20 @@ def decrypt_file(file_path, private_key):
         flat_array = np.clip(np.array(decrypted_segments), 0, 255).astype(np.uint8)
         img = flat_array.reshape(metadata["height"], metadata["width"], 3)
         
-        original_extension = file_path.suffix
+        original_extension = file_path.stem.split(".")[-1] if "." in file_path.stem else ".png"
         output_path = file_path.stem
-        cv2.imwrite(str(Path(output_path).with_suffix(original_extension)), img)
-        print(f"Imaginea {file_path} a fost decriptată și salvată ca {output_path}{original_extension}")
         
-        os.startfile(str(Path(output_path).with_suffix(original_extension)))
+        success = cv2.imwrite(output_path, img)
+        if not success:
+            raise ValueError(f"Error at saving file {output_path}")
+        
+        print(f"File {file_path} decrypted successfully and saved!")
+        os.startfile(output_path)
     else:
         output_path = file_path.stem
         with open(output_path, 'wb') as dec_file:
             dec_file.write(bytes(decrypted_segments))
-        print(f"Fișierul text {file_path} a fost decriptat și salvat ca {output_path}")
+        print(f"File {file_path} decrypted successfully and saved!")
         
         if os.name == 'nt':
             os.startfile(output_path)

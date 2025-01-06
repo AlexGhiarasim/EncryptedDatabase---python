@@ -6,6 +6,15 @@ import sys
 sys.setrecursionlimit(1000000)
 
 def read_file(file_name):
+    """
+    This function reads a file from the disk and decrypts it.
+
+    Parameters:
+    file_name (str): The name of the file that needs to be read.
+
+    Returns:
+    str: A message indicating the result of the operation.
+    """
     query = "SELECT file_path, encryption_key FROM file_metadata WHERE file_name = %s;"
     update_last_accessed = "UPDATE file_metadata SET last_accessed = CURRENT_TIMESTAMP WHERE file_name = %s;"
 

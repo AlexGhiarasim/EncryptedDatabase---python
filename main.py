@@ -7,6 +7,15 @@ from file_operations.delete_file import *
 from file_operations.read_file import *
 
 def get_data():
+    """
+    This function reads the input from the user, processes it, and displays the output in the output label.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     input_text = input_entry.get()
     try:
         parts = input_text.strip().split(" ", 1)
@@ -37,6 +46,9 @@ def get_data():
     input_entry.delete(0, tk.END)
 
 def runApp(): 
+    """
+    This function checks if the connection to the database can be established.
+    """
     try:
         connection = get_connection()
         if connection:
@@ -48,12 +60,21 @@ def runApp():
         return False
 
 def on_enter(e, button, hover_color):
+    """
+    This function changes the background color of a button when the mouse hovers over it.
+    """
     button.config(bg=hover_color)
 
 def on_leave(e, button, default_color):
+    """
+    This function changes the background color of a button when the mouse leaves it.
+    """
     button.config(bg=default_color)
 
 if runApp():
+    """
+    This code creates the GUI for the application. 
+    """
     window = tk.Tk()
     window.title("Encrypted Security System")
     window.geometry("800x500")

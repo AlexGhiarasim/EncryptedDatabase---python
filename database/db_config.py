@@ -9,6 +9,18 @@ db_config = {
 }
 
 class DatabaseConnection:
+    """
+    This class is used to manage the connection to the database
+
+    Attributes:
+    db_config (dict): A dictionary containing the database connection parameters.
+    _connection (psycopg2.connection): The connection object to the database.
+
+    Methods:
+    try_connection(): Tries to establish a connection to the database.
+    close_connection(): Closes the connection to the database.
+    
+    """
     def __init__(self, db_config):
         self.db_config = db_config
         self._connection = None
